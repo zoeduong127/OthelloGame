@@ -387,25 +387,24 @@ public class OthelloGame implements Game{
     */
     @Override
     public boolean isValidMove(OthelloMove move) {
-        if (this.CheckAbove(move)) {
-            return true;
-        } else if (this.CheckBelow( move)) {
-            return true;
-        } else if (this.CheckLeft(move)){
-            return true;
-        } else if (this.CheckRight(move)) {
-            return true;
-        } else if (this.CheckLeftAbove(move)) {
-            return true;
-        } else if (this.CheckLeftBelow( move)) {
-            return true;
-        } else if (this.CheckRightAbove( move)) {
-            return true;
-        } else if (this.CheckRightBelow(move)) {
-            return true;
-        } else {
-            return false;
+        if(board.isField(move.getRow(), move.getCol())) {
+            if (this.CheckAbove(move)) {
+                return true;
+            } else if (this.CheckBelow(move)) {
+                return true;
+            } else if (this.CheckLeft(move)) {
+                return true;
+            } else if (this.CheckRight(move)) {
+                return true;
+            } else if (this.CheckLeftAbove(move)) {
+                return true;
+            } else if (this.CheckLeftBelow(move)) {
+                return true;
+            } else if (this.CheckRightAbove(move)) {
+                return true;
+            } else return this.CheckRightBelow(move);
         }
+        return false;
     }
 
     /**
@@ -501,7 +500,7 @@ public class OthelloGame implements Game{
         //Flip all valid mark if left-above direction is possible
         if(this.CheckLeftAbove(move)){board.setField(move.getRow(),move.getCol(), getMark());int j = move.getCol() - 1;
             for (int i = move.getRow() - 1; 0<= i; i--) {
-                if (0 <=j ) {
+                if (0 <=j ){
                     if (!board.getField(i, j).equals(getMark()) && !board.getField(i, j).equals(Mark.EMPTY.getSymbol())) {
                         board.setField(i,j, getMark());
                         j -=1;
