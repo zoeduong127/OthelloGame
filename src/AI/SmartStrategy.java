@@ -2,92 +2,89 @@ package AI;
 
 import model.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Implements the Strategy interface to define a Smart Strategy.
  */
 public class SmartStrategy implements Strategy {
-    private final int DEPTH = 5;
     private String name;
+
 
     public SmartStrategy() {
         this.name = "Smart Strategy";
     }
-
-    /**
-     * Getter for the name of the strategy.
-     * @return String name of strategy
-     */
-    public String getName() {
-        return name;
+    public int heuristic(OthelloGame game, Player player){
+        int ourScore = game.getScore(player);
+        int opponetScore = game.getScore(game.getOppositePlayer());
+        return (ourScore - opponetScore);
     }
-
-
-    public OthelloMove getMove(OthelloGame game){
-        return findWinningMove(game);
-    }
-
     /**
      * Determines whether there is a move that instantly wins the game for the current player.
      * @param game The instance of TicTacToeGame which is being played
      * @return Move which wins the game, or null if no such move exists
      */
-    public OthelloMove findWinningMove(OthelloGame game) {
-        int bestValue = -1000;
-        int alpha = -1000;
-        int beta = 1000;
-        OthelloMove bestMove = null;
-        List<OthelloMove> moves = game.getValidMoves(Mark.XX.getSymbol());
-        for(int i = 0; i < moves.size(); i ++){
-            game.doMove(new OthelloMove(Mark.XX.getSymbol(), moves.get(i).getRow(), moves.get(i).getCol()));
-            int value = Minimax(game,0,alpha,beta,false);
-            game.doMove(new OthelloMove(Mark.EMPTY.getSymbol(),moves.get(i).getRow(), moves.get(i).getCol()));
-            if(bestValue < value){
-                bestValue = value;
-                bestMove = moves.get(i);
-            }
-            alpha = Math.max(alpha, bestValue);
-            if(beta <= alpha){
-                break;
+    @Override
+    public OthelloMove determineMove(OthelloGame game){
+        List<OthelloMove> validMove = game.getValidMoves();
+        int bestMove = Integer.MIN_VALUE;
+        OthelloMove bestmove = null;
+        Player original = game.getTurn();
+        Player opponent = game.getOppositePlayer();
+        for(OthelloMove move : validMove){
+            Game copyGame = game.deepCopy();
+            copyGame.doMove(move);
+            int val = minimaxValue((OthelloGame) copyGame, original, opponent,1);
+            if(val > bestMove){
+                bestMove = val;
+                bestmove = move;
             }
         }
-        return bestMove;
+        return bestmove;
     }
-    private int Minimax(OthelloGame game, int depth, int alpha, int beta, boolean b){
-//        if(game.isGameOver() || depth == DEPTH){
-//            return game.i;
-//        }
-        if(b){
-            int best = -1000;
-            List<OthelloMove> list = game.getValidMoves(Mark.XX.getSymbol());
-            for(int i = 0; i < list.size(); i ++) {
-                game.doMove(new OthelloMove(Mark.XX.getSymbol(), list.get(i).getRow(), list.get(i).getCol()));
-                int value = Minimax(game, depth + 1, alpha, beta, false);
-                game.doMove(new OthelloMove(Mark.EMPTY.getSymbol(), list.get(i).getRow(), list.get(i).getCol()));
-                best = Math.max(best, value);
-                alpha = Math.max(alpha, best);
-                if(beta <= alpha) {
-                    break;
+    public int minimaxValue(OthelloGame game1,Player original, Player current, int depth){
+        if((depth == 6) || game1.isGameOver()){
+            return heuristic(game1, original);
+        }
+        Player opponent = game1.getOppositePlayer();
+        List<OthelloMove> validMove = game1.getValidMoves();
+        int numMoves = game1.getValidMoves().size();
+        if(numMoves == 0){
+            return minimaxValue(game1, original, opponent, depth + 1);
+        }else {
+            int bestMoveval = Integer.MIN_VALUE; // for finding max
+            if (original != current) {
+                bestMoveval = Integer.MAX_VALUE; // for fining min
+            }
+            for (OthelloMove move : validMove) {
+                OthelloGame gamecopy = game1.deepCopy();
+                gamecopy.doMove(move);
+                int val = minimaxValue(gamecopy, original, opponent, depth + 1);
+                if (original == current) {
+                    if (val > bestMoveval) {
+                        bestMoveval = val;
+                    }
+                } else {
+                    if (val < bestMoveval) {
+                        bestMoveval = val;
+                    }
                 }
             }
-            return best;
-        }else{
-            int best = 1000;
-            List<OthelloMove> list = game.getValidMoves(Mark.OO.getSymbol());
-            for(int i = 0; i < list.size(); i ++) {
-                game.doMove(new OthelloMove(Mark.OO.getSymbol(), list.get(i).getRow(), list.get(i).getCol()));
-                int value = Minimax(game, depth + 1, alpha, beta, true);
-                game.doMove(new OthelloMove(Mark.EMPTY.getSymbol(), list.get(i).getRow(), list.get(i).getCol()));
-                best = Math.max(best, value);
-                alpha = Math.max(alpha, best);
-                if(beta <= alpha) {
-                    break;
-                }
-            }
-            return best;
+            return bestMoveval;
         }
     }
+
+        /**
+         * Getter for the name of the strategy.
+         * @return String name of strategy
+         */
+    public String getName() {
+        return name;
+    }
+
+
+
 
     /**
      * Determines which move should be played next by the Smart Strategy.
@@ -98,8 +95,4 @@ public class SmartStrategy implements Strategy {
      * @return Move which wins the game instantly, move which stops enemy from winning
      * or random move if the former don't apply.
      */
-    @Override
-    public OthelloMove determineMove(OthelloGame game) {
-          return getMove(game);
-    }
 }

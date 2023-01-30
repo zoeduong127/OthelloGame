@@ -30,7 +30,7 @@ public class Board {
      * The DIM by DIM fields of the Othello board. See NUMBERING for the
      * coding of the fields.
      */
-    private String[][] fields;
+    private final String[][] fields;
 
     // -- Constructors -----------------------------------------------
 
@@ -58,10 +58,8 @@ public class Board {
      @*/
     public Board deepCopy() {
         Board copy = new Board();
-        for (int i = 0; i < copy.fields.length; i++) {
-            for (int j = 0; j < copy.fields.length; j++) {
-                copy.fields[i][j] = this.fields[i][j];
-            }
+        for (int i = 0; i < fields.length; i++) {
+            System.arraycopy(fields[i], 0, copy.fields[i], 0, fields[i].length);
         }
         return copy;
     }
@@ -101,7 +99,7 @@ public class Board {
     ensures getField(row, col) == Mark.EMPTY.getSymbol() ==> \result == true;
      @*/
     public boolean isEmptyField(int row, int col) {
-        return fields[row][col] == Mark.EMPTY.getSymbol();
+        return fields[row][col].equals(Mark.EMPTY.getSymbol());
     }
 
 
@@ -131,7 +129,7 @@ public class Board {
     public boolean isFull() {
         for (int i = 0 ; i < DIM; i ++) {
             for (int j = 0 ; j < DIM ; j ++) {
-                if (fields[i][j] == Mark.EMPTY.getSymbol()) {
+                if (fields[i][j].equals(Mark.EMPTY.getSymbol())) {
                     return false;
                 }
             }
@@ -169,7 +167,7 @@ public class Board {
         for (int i = 0; i < DIM; i++) {
             String row = "";
             for (int j = 0; j < DIM; j++) {
-                row += " " + getField(i, j).toString().substring(0, 1).replace("E", " ") + " ";
+                row += " " + getField(i, j).substring(0, 1).replace("E", " ") + " ";
                 if (j < DIM - 1) {
                     if(j == 0){
                         row =  i+ " " + row + "|";
@@ -187,6 +185,10 @@ public class Board {
     }
     public static void main (String[] arg){
         Board board = new Board();
-        System.out.println(board.toString());
+        Board board1 = board.deepCopy();
+        board1.setField(1,1,Mark.OO.getSymbol());
+        System.out.println(board);
+        System.out.println(board1);
+
     }
 }

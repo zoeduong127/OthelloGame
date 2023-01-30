@@ -19,6 +19,10 @@ public class ComputerPlayer extends AbstractPlayer {
         this.strategy = strategy;
         this.mark = mark;
     }
+    public ComputerPlayer(Strategy strategy){
+        super(strategy.getName());
+        this.strategy = strategy;
+    }
 
     public OthelloMove determineMove(OthelloGame game) {
         return strategy.determineMove(game);

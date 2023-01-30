@@ -16,7 +16,7 @@ public class NaiveStrategy implements Strategy {
     public NaiveStrategy() {
         this.name = "Naive Strategy";
     }
-
+    public NaiveStrategy(String name){this.name = name;}
     /**
      * Getter for the name of the Strategy.
      * @return String name of the Strategy
@@ -25,17 +25,22 @@ public class NaiveStrategy implements Strategy {
         return name;
     }
 
-    @Override
-    public OthelloMove determineMove(OthelloGame game) {
-        List<OthelloMove> validMoves = game.getValidMoves();
-        Random rand = new Random();
-        int value = rand.nextInt(validMoves.size());
-        return validMoves.get(value);
-    }
-
     /**
      * Determines the move to be played by the Naive Strategy.
      * @param game The instance of TicTacToeGame that is being played
      * @return Move selected randomly from the currently available moves.
      */
+
+    @Override
+    public OthelloMove determineMove(OthelloGame game) {
+        List<OthelloMove> validMoves = game.getValidMoves();
+        if(validMoves.size() > 0) {
+            Random rand = new Random();
+            int value = rand.nextInt(game.getValidMoves().size());
+            return validMoves.get(value);
+        }
+        return new OthelloMove(game.getMark(), 7, 8);
+    }
+
+
 }

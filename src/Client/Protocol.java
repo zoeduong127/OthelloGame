@@ -1,5 +1,7 @@
 package Client;
 
+import Client.Model.Command;
+
 /**
  * Protocol class with constants and methods for creating protocol messages
  */
@@ -15,9 +17,10 @@ public final class Protocol {
      * @param message The message you want to send
      * @return the protocol message
      */
-    public static String printCommand(String command, String argument) {
+    public static String sendCommand(String command, String argument) {
         return command + SEPARATOR + argument;
     }
+
 
     /**
      * Build a new protocol message which instructs a client that another client said something

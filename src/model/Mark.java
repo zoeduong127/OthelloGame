@@ -22,4 +22,5 @@ public enum Mark {
     public String getSymbol() {
         return symbol;
     }
+
 }
