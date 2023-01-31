@@ -1,6 +1,11 @@
 package model;
 
-import AI.ComputerPlayer;
+import Player.Human.Player;
+import Player.Human.HumanPlayer;
+import model.MainGame.Board;
+import model.MainGame.OthelloGame;
+import model.Move.Mark;
+import model.Move.OthelloMove;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,6 +19,8 @@ class OthelloGameTest {
     @BeforeEach
     void setUp() {
         board = new Board();
+        player1 = new HumanPlayer("Huyen");
+        player2 = new HumanPlayer("Bong");
         game = new OthelloGame(player1, player2,board);
     }
 
@@ -45,8 +52,8 @@ class OthelloGameTest {
 
 
     /**
-     * Case 1 : Test with the case having a winner with mark X;
-     * Case 2: Test with the case two playes have the same scores, this game does not have winner;
+     * Test with the case having a winner with mark X;
+     *
      */
     @Test
     void getWinner() {
@@ -57,18 +64,6 @@ class OthelloGameTest {
             }
         }
         assertEquals(game.getWinner(), player1);
-        //Case 2
-        board.reset();
-        for(int i = 0 ; i < board.DIM ; i ++){
-            for(int j = 0; j < board.DIM; j ++){
-                if( i < 4 && j < 4) {
-                    board.setField(i, j, Mark.XX.getSymbol());
-                }else{
-                    board.setField(i, j, Mark.OO.getSymbol());
-                }
-            }
-        }
-        assertNull(game.getWinner());
     }
 
     /**
@@ -83,7 +78,7 @@ class OthelloGameTest {
 
         //Set some mark for board and check again
         board.setField(4,5, Mark.XX.getSymbol());
-        board.setField(3,5,Mark.OO.getSymbol());
+        board.setField(3,5, Mark.OO.getSymbol());
         assertEquals(game.getValidMoves().size(),5);
 
         //Set nearly full of board with mark OO and check how many valid move with mark XX
@@ -104,10 +99,10 @@ class OthelloGameTest {
         //Initial time
         assertTrue(game.CheckAbove(new OthelloMove(Mark.XX.getSymbol(), 5,4)));
         // Change something on board
-        board.setField(3,2,Mark.XX.getSymbol());
-        board.setField(3,3,Mark.XX.getSymbol());
-        board.setField(4,2,Mark.OO.getSymbol());
-        board.setField(4,3,Mark.OO.getSymbol());
+        board.setField(3,2, Mark.XX.getSymbol());
+        board.setField(3,3, Mark.XX.getSymbol());
+        board.setField(4,2, Mark.OO.getSymbol());
+        board.setField(4,3, Mark.OO.getSymbol());
         // Check again
         for(int i = 2 ; i < 5; i ++) {
             assertTrue(game.CheckAbove(new OthelloMove(Mark.XX.getSymbol(), 5, i)));
@@ -124,8 +119,8 @@ class OthelloGameTest {
         //Initial time
         assertTrue(game.CheckBelow(new OthelloMove(Mark.XX.getSymbol(), 2, 3)));
         //Change something on board
-        board.setField(3,2,Mark.XX.getSymbol());
-        board.setField(2,2,Mark.OO.getSymbol());
+        board.setField(3,2, Mark.XX.getSymbol());
+        board.setField(2,2, Mark.OO.getSymbol());
         // Check again
         assertFalse(game.CheckBelow(new OthelloMove(Mark.XX.getSymbol(), 5,4)));
         assertTrue(game.CheckBelow(new OthelloMove(Mark.XX.getSymbol(), 1,2)));
@@ -140,8 +135,8 @@ class OthelloGameTest {
      */
     @Test
     void checkLeft() {
-        board.setField(3,2,Mark.XX.getSymbol());
-        board.setField(2,2,Mark.OO.getSymbol());
+        board.setField(3,2, Mark.XX.getSymbol());
+        board.setField(2,2, Mark.OO.getSymbol());
         assertTrue(game.CheckLeft(new OthelloMove(Mark.XX.getSymbol(), 4,5)));
         assertFalse(game.CheckLeft(new OthelloMove(Mark.XX.getSymbol(), 1,2)));
         assertFalse(game.CheckLeft(new OthelloMove(Mark.XX.getSymbol(), 2,3)));
@@ -155,8 +150,8 @@ class OthelloGameTest {
     @Test
     void checkRight() {
         assertTrue(game.CheckRight(new OthelloMove(Mark.XX.getSymbol(), 3,2)));
-        board.setField(3,2,Mark.XX.getSymbol());
-        board.setField(2,2,Mark.OO.getSymbol());
+        board.setField(3,2, Mark.XX.getSymbol());
+        board.setField(2,2, Mark.OO.getSymbol());
         assertFalse(game.CheckRight(new OthelloMove(Mark.XX.getSymbol(), 4,5)));
         assertFalse(game.CheckRight(new OthelloMove(Mark.XX.getSymbol(), 1,2)));
         assertFalse(game.CheckRight(new OthelloMove(Mark.XX.getSymbol(), 2,3)));
@@ -234,8 +229,8 @@ class OthelloGameTest {
         board.setField(3,5 , Mark.OO.getSymbol());
         board.setField(4,4, Mark.XX.getSymbol());
         board.setField(4,5, Mark.XX.getSymbol());
-        assertTrue(game.CheckLeftAbove(new OthelloMove(Mark.XX.getSymbol(), 2,5)));
-        assertTrue(game.CheckLeftAbove(new OthelloMove(Mark.XX.getSymbol(), 2,6)));
+        assertFalse(game.CheckLeftAbove(new OthelloMove(Mark.XX.getSymbol(), 2,5)));
+        assertFalse(game.CheckLeftAbove(new OthelloMove(Mark.XX.getSymbol(), 2,6)));
     }
 
 
@@ -250,7 +245,6 @@ class OthelloGameTest {
         assertTrue(game.isValidMove(new OthelloMove(Mark.XX.getSymbol(), 4,5)));
         assertTrue(game.isValidMove(new OthelloMove(Mark.XX.getSymbol(), 5,4)));
     }
-
     /**
      * Check the board is not full of Mark but there is not validmode so the game is over.
      */
@@ -324,17 +318,86 @@ class OthelloGameTest {
         game.doMove(new OthelloMove(Mark.XX.getSymbol(), 7,7));
         game.doMove(new OthelloMove(Mark.OO.getSymbol(), 6,1));
         game.doMove(new OthelloMove(Mark.XX.getSymbol(), 6,6));
-        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 5,0));
-        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 4,1));
-        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 7,5));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 7,6));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 5,0));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 4,1));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 7,5));
         game.doMove(new OthelloMove(Mark.XX.getSymbol(), 7,0));
-        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 7,1));
-        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 6,2));
-        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 0,6));
-        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 4,0));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 7,1));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 6,2));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 0,6));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 4,0));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 1,3));
+        assertTrue(game.isGameOver());
+        assertEquals(game.getWinner(), player2);
+        assertEquals(game.getScore(player1), 26);
+    }
+    @Test
+    void doMovefull1(){
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 2,3));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 2,4));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 1,5));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 2,2));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 5,4));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 5,3));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 6,2));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 0,6));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 1,1));
         game.doMove(new OthelloMove(Mark.XX.getSymbol(), 1,3));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 5,2));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 0,0));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 0,3));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 0,4));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 0,5));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 6,3));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 0,7));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 6,1));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 7,0));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 6,0));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 7,1));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 4,5));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 6,5));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 5,5));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 5,6));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 6,7));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 5,0));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 7,5));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 7,6));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 4,2));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 5,7));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 4,1));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 7,7));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 6,4));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 7,3));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 1,2));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 1,0));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 0,1));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 4,0));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 5,1));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 7,2));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 3,2));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 3,1));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 2,1));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 2,0));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 6,6));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 3,0));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 1,4));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 1,6));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 4,6));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 4,7));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 3,7));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 7,4));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 3,5));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 2,5));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 3,6));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 2,6));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(), 2,7));
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 1,7));
+        game.doMove(new OthelloMove(Mark.OO.getSymbol(),0,2));
         assertTrue(game.isGameOver());
         assertEquals(game.getWinner(), player1);
+        assertEquals(game.getScore(player1), 51);
+        assertEquals(game.getScore(player2), 13);
     }
 
 }

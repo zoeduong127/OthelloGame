@@ -1,5 +1,7 @@
 package model;
 
+import model.MainGame.Board;
+import model.Move.Mark;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
