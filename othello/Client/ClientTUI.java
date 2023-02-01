@@ -1,4 +1,4 @@
-package UI;
+package Client;
 
 import Client.Client;
 
@@ -73,7 +73,7 @@ public class ClientTUI {
                     commandValid = true;
                     break;
                 case HELP:
-                    printHelp();
+                    handleUserchoice();
                     commandValid = true;
                     break;
                 case QUIT:
@@ -115,7 +115,11 @@ public class ClientTUI {
         try {
             serverPort = Integer.parseInt(reader.readLine());
         }catch(NumberFormatException e){
+            println("You must enter a number");
             getPort();
+        }
+        catch(IllegalArgumentException e){
+            println("Your port number must be smaller than 65536 and greater than -1");
         }
         return serverPort;
     }

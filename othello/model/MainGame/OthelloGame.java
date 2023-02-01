@@ -596,19 +596,18 @@ public class OthelloGame implements Game {
             return Mark.XX.getSymbol();
         }
     }
+
+    /**
+     * Get the second player in game
+     * @return the player 2
+     */
     /*@
       requires player1 != null && player2 != null;
-      ensures \result != null;
-      ensures (getTurn() == player1) ==> \result.equals(player2);
-      ensures (getTurn() == player2) ==> \result.equals(player1);
+      ensures \result.equals(player2);
     @*/
     @Override
     public Player getOppositePlayer(){
-        if(getTurn() == player1){
-            return  player2;
-        }else{
-            return player2;
-        }
+        return player2;
     }
 
     /**

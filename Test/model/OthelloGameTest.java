@@ -5,6 +5,7 @@ import Player.Human.HumanPlayer;
 import model.MainGame.Board;
 import model.MainGame.OthelloGame;
 import model.Move.Mark;
+import model.Move.Move;
 import model.Move.OthelloMove;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,6 +65,50 @@ class OthelloGameTest {
             }
         }
         assertEquals(game.getWinner(), player1);
+    }
+
+    /**
+     * Check to return right mark of this current turn.
+     */
+
+    @Test
+    void getMark(){
+        Move move = new OthelloMove(Mark.XX.getSymbol(), 2,3);
+        assertEquals(game.getMark(), Mark.XX.getSymbol());
+        game.doMove(move);
+        assertEquals(game.getMark(), Mark.OO.getSymbol());
+        assertFalse(game.getMark().equals(move.getMark()));
+    }
+
+    /**
+     * Check to return right mark of opponent in this turn
+     */
+
+    @Test
+    void getOppositeMark(){
+        assertEquals(game.getOppositeMark(), Mark.OO.getSymbol());
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 2,3));
+        assertEquals(game.getOppositeMark(), Mark.XX.getSymbol());
+    }
+
+    /**
+     * Check to know who is playing
+     */
+    @Test
+    void getTurn(){
+        assertEquals(game.getTurn(), player1);
+        game.doMove(new OthelloMove(Mark.XX.getSymbol(), 2,3));
+        assertEquals(game.getTurn(), player2);
+    }
+
+
+    /**
+     * Check copy the board and the game.
+     */
+
+    @Test
+    void checkdeepCopy(){
+        assertEquals(game.deepCopy().toString(), game.toString());
     }
 
     /**
@@ -263,6 +308,7 @@ class OthelloGameTest {
         assertEquals(game.getWinner(), player1);
     }
 
+
     /**
      * Check the board is full and find winner by comparing the score.
      */
@@ -399,5 +445,6 @@ class OthelloGameTest {
         assertEquals(game.getScore(player1), 51);
         assertEquals(game.getScore(player2), 13);
     }
+
 
 }

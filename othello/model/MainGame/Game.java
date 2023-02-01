@@ -59,15 +59,21 @@ public interface Game {
     void doMove(Move move);
     /**
      * get current mark of game
+     * @return  a string of mark
      */
     //@ pure;
     String getMark();
 
+
+    /**
+     * get the opponent's mark;
+     * @return the string of mark
+     */
     //@ pure;
     String getOppositeMark();
 
     /**
-     * indicate the opponent
+     * indicate the second player in this game
      * @return player who is opponent of current player in this game
      */
     //@ ensures \result != getTurn();

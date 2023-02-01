@@ -62,7 +62,7 @@ import java.util.List;
         for(Move move : validMove){
             Game copyGame = game.deepCopy();
             copyGame.doMove(move);
-            int val = minimaxValue((OthelloGame) copyGame, original, opponent,1);
+            int val = minimaxValue((OthelloGame) copyGame, original,opponent,1);
             if(val > bestMove){
                 bestMove = val;
                 bestmove = move;
@@ -99,7 +99,7 @@ import java.util.List;
         }else {
             int bestMoveval = Integer.MIN_VALUE; // for finding max
             if (original != current) {
-                bestMoveval = Integer.MAX_VALUE; // for fining min
+                bestMoveval = Integer.MAX_VALUE; // for finding min
             }
             for (Move move : validMove) {
                 Game gamecopy = game1.deepCopy();

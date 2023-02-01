@@ -138,14 +138,14 @@ public class OthelloTUI extends JPanel {
                 Game game = new OthelloGame(player1, player2,new Board());
 
                 while (true) {
-                    Move nextMove = player1.determineMove((OthelloGame) game);
+                    Move nextMove = player1.determineMove(game);
                     game.doMove(nextMove);
 
                     if (game.isGameOver()) {
                         break;
                     }
 
-                    nextMove = player2.determineMove((OthelloGame) game);
+                    nextMove = player2.determineMove(game);
                     game.doMove(nextMove);
 
                     if (game.isGameOver()) {

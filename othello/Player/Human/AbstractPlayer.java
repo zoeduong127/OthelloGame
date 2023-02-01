@@ -12,6 +12,7 @@ public abstract class AbstractPlayer implements Player {
 
     /**
      * Creates a new Player object.
+     * @param name name of player
      */
     /*@ requires name != null;
         ensures getName() == name;

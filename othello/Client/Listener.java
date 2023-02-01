@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.net.SocketException;
 
 /**
  * A class that listens to incoming messages from a server and calls the appropriate
@@ -12,6 +13,7 @@ import java.net.Socket;
 public class Listener implements Listen, Runnable{
     private final Socket socket;
     private final Client client;
+    private BufferedReader reader;
     public Listener(Client client, Socket socket){
         this.socket = socket;
         this.client = client;
@@ -45,7 +47,8 @@ public class Listener implements Listen, Runnable{
                 client.handleMove(input);
                 break;
             case Command.GAMEOVER:
-                client.handleGameover(split);
+                client.TUI.println(input);
+                client.handleGameover(input);
                 break;
             case Command.LIST:
                 client.handleList(input);
@@ -65,18 +68,24 @@ public class Listener implements Listen, Runnable{
 
     @Override
     public void run() {
-        BufferedReader reader;
-        try {
-            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String line;
-            while((line = reader.readLine()) != null){
-                handleMessage(line);
+        while (true) {
+            try {
+                reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    handleMessage(line);
+                }
+                reader.close();
+            } catch (SocketException e) {
+                client.TUI.println("Lost connection ! Please reload ");
+                client.close();
+                System.exit(0);
+            } catch (IOException e) {
+                client.close();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+                client.close();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            client.close();
-        } catch (ProtocolException e) {
-            e.printStackTrace();
         }
     }
 }

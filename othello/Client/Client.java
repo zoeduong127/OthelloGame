@@ -5,7 +5,6 @@ import Player.AI.NaiveStrategy;
 import Player.AI.SmartStrategy;
 import Player.Human.AbstractPlayer;
 import Player.Human.HumanPlayer;
-import UI.ClientTUI;
 import model.MainGame.Board;
 import model.MainGame.OthelloGame;
 import model.Move.Move;
@@ -14,10 +13,12 @@ import model.Move.OthelloMove;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.NoRouteToHostException;
 import java.net.Socket;
+import java.net.SocketException;
+
 import static Client.Command.*;
 import static Client.Protocol.*;
-import static UI.ClientTUI.reader;
 
 /**
  * Client is class working directly with player and server.
@@ -59,8 +60,11 @@ public class Client implements Runnable{
             running = true;
             new Thread(this).start();
             return true;
+        } catch (NoRouteToHostException e){
+            TUI.println(" Some problems with your connection ! Please check your Internet and try again");
+            return false;
         } catch (IOException e) {
-            e.printStackTrace();
+            TUI.println(Command.ERROR + "Some problem in reading input");
             return false;
         }
     }
@@ -86,8 +90,10 @@ public class Client implements Runnable{
             this.running = false;
             this.socket.close();
             pr.close();
+        } catch(SocketException e){
+            System.exit(0);
         } catch (IOException e) {
-            e.printStackTrace();
+            TUI.println(Command.ERROR + " Some problem in reading input");
         }
     }
 
@@ -157,14 +163,9 @@ public class Client implements Runnable{
     /**
      * Get username from player and send a request login with this username to server
      * Afterward,setting the state of player to "LOGIN_AWAITING".
-     * @throws IOException if an I/O error occurs when the client is communicating with the server.
      */
 
-    /*@
-        ensures this.username == reader.readLine();
-        ensures this.state == ClientState.LOGIN_AWAITING;
-    */
-
+    //@ ensures this.state == ClientState.LOGIN_AWAITING;
     public synchronized void requestLogin(){
         try {
             String username = TUI.getString(Servermess("Welcome to Othell, please Enter your name? "));
@@ -271,10 +272,12 @@ public class Client implements Runnable{
       @ ensures ((\forall Move move ;game.isValidMove(move); player.determineMove(game) == move));
       @*/
     public synchronized void makeMove(){
-        if(game.getTurn() == player) {
+        if(game.getTurn().equals(player)) {
             Move move = player.determineMove(game);
             int number = move.getRow() * 8 + move.getCol();
             sendCommand(Command.MOVE, Integer.toString(number));
+        }else{
+            TUI.println("Wait for your turn");
         }
     }
 
@@ -297,6 +300,10 @@ public class Client implements Runnable{
             OthelloMove move = new OthelloMove(game.getMark(), row, col);
             this.game.doMove(move);
             System.out.println(game);
+            if(this.game.isGameOver()){
+                TUI.println("Game Over");
+                return;
+            };
             if (game.getTurn() == player) {
                 this.makeMove();
             } else {
@@ -307,26 +314,28 @@ public class Client implements Runnable{
 
     /**
      * Handles game over which is sent from server by checking the reason of game over first
-     * @param arguments message from server is split by listener
+     * @param input message from server is split by listener
      * @throws IOException if an I/O error occurs when the client is communicating with the server.
      */
     /*@
-      requires arguments != null;
+      requires input != null;
+      requires input.startsWith(Command.GAMEOVER);
       requires game.isGameOver() == true;
       ensures state == ClientState.DECISION && state != \old(state);
     */
-    public synchronized void handleGameover(String[] arguments) throws IOException {
-        String winner = Servermess("\nCongratulation "+arguments[2]+ " are winner ");
+    public synchronized void handleGameover(String input) throws IOException {
+        String[] arguments = input.split(SEPARATOR);
         switch (arguments[1]) {
             case Command.VICTORY:
                 if (arguments[2].equals(username)) {
-                    TUI.println(Servermess("You are WINNER"));
+                    TUI.println(Servermess("\nCongratulation You are winner "));
                 } else {
                     TUI.println(Servermess("Gook luck later !"));
                 }
                 break;
             case Command.DISCONNECT:
-                TUI.println(Servermess("Your opponent disconnected "+ winner));
+                String winner = Servermess("\nCongratulation Your are winner ");
+                TUI.println(Servermess("Your opponent disconnected " + winner));
                 break;
             case Command.DRAW:
                 TUI.println(Servermess("Draw ! No winner!"));
@@ -342,6 +351,7 @@ public class Client implements Runnable{
     //@ ensures running == false;
     public synchronized void handleQuit(){
         TUI.println(Servermess("Server will disconnect"));
+        System.exit(0);
         this.close();
     }
 
@@ -356,7 +366,6 @@ public class Client implements Runnable{
     */
     public synchronized void handleError(String input){
         String[] error = input.split(SEPARATOR);
-        TUI.println(SERVER_MESS + ERROR + input);
         if(error[1].equals(MOVE)){
             makeMove();
         }
@@ -367,7 +376,7 @@ public class Client implements Runnable{
      * Set player as your request.
      * @throws IOException if I/O occurs during reading process from input .
      */
-    /*@ requires reader != null && username != null;
+    /*@ requires username != null;
         ensures (player instanceof ComputerPlayer ||player instanceof ComputerPlayer || player instanceof HumanPlayer);
      @*/
     public void setupPlayer() throws IOException {

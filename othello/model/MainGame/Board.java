@@ -42,6 +42,7 @@ public class Board {
 
     /**
      * Creates a deep copy of this field.
+     * @return the copy of board game
      */
     /*@ ensures \result != this;
      ensures (\forall int i; (i >= 0 && i < DIM*DIM); \result.fields[i] == this.fields[i]);
@@ -57,6 +58,8 @@ public class Board {
     /**
      * Returns true if index is a valid index of a field on the board.
      *
+     * @param row - row of this field
+     * @param col - the column of this field
      * @return the (row,col)-field
      */
     //@ ensures row >= 0 && row < DIM && col >= 0 && col < DIM ==> \result == true;
