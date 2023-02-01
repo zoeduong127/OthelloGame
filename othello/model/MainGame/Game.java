@@ -61,7 +61,10 @@ public interface Game {
      * get current mark of game
      */
     //@ pure;
-    String  getMark();
+    String getMark();
+
+    //@ pure;
+    String getOppositeMark();
 
     /**
      * indicate the opponent

@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Locale;
 import static Client.Command.*;
 import static Client.Protocol.*;
 import static UI.ClientTUI.reader;
@@ -37,7 +36,7 @@ public class Client implements Runnable{
     private OthelloGame game;
 
     public Client (){
-        this.TUI = new ClientTUI();
+        this.TUI = new ClientTUI(this);
         this.running = false;
         this.state = ClientState.CONNECT_AWAITING;
     }
@@ -109,7 +108,7 @@ public class Client implements Runnable{
      * @param mess The message to be sent.
      */
     //@ requires mess != null;
-    public  void sendMessage(String mess){
+    public void sendMessage(String mess){
         pr.println(mess);
     }
 
@@ -123,7 +122,7 @@ public class Client implements Runnable{
       requires command != null && descripton != null;
       requires Protocol.sendCommand(command, descripton) != null;
     */
-    public  void sendCommand(String command, String descripton){
+    public void sendCommand(String command, String descripton){
         String mess = Protocol.sendCommand(command,descripton);
         sendMessage(mess);
         TUI.println(SEND_COMMAND+ mess);
@@ -168,8 +167,7 @@ public class Client implements Runnable{
 
     public synchronized void requestLogin(){
         try {
-            TUI.println(Servermess("Welcome to Othell, please Enter your name? "));
-            String username = reader.readLine();
+            String username = TUI.getString(Servermess("Welcome to Othell, please Enter your name? "));
             this.username = username;
             sendCommand(Command.LOGIN,username);
             setState(ClientState.LOGIN_AWAITING);
@@ -187,7 +185,7 @@ public class Client implements Runnable{
         TUI.println(Servermess("Login succesfull with username : "+ username));
         if(state.equals(ClientState.LOGIN_AWAITING)){
             setState(ClientState.DECISION);
-            this.handleUserchoice();
+            TUI.handleUserchoice();
         }
     }
     /**
@@ -217,7 +215,7 @@ public class Client implements Runnable{
         for(int i = 1; i < active.length; i++){
             TUI.println(active[i]);
         }
-        this.handleUserchoice();
+        TUI.handleUserchoice();
     }
 
     /**
@@ -335,7 +333,7 @@ public class Client implements Runnable{
                 break;
         }
         setState(ClientState.DECISION);
-        this.handleUserchoice();
+        TUI.handleUserchoice();
     }
     /**
      * Disconnect to server and close the socket because player want to log out of game .
@@ -373,18 +371,13 @@ public class Client implements Runnable{
         ensures (player instanceof ComputerPlayer ||player instanceof ComputerPlayer || player instanceof HumanPlayer);
      @*/
     public void setupPlayer() throws IOException {
-        TUI.println(Clientmess("Do you want AI to replace you ? Type YES or NO"));
-        String decision = reader.readLine().toUpperCase(Locale.ROOT);
-        if(decision.equals("YES")) {
-            TUI.println(Clientmess("Choose Native (-N) / Smart (-S)"));
-            String AI = reader.readLine().toUpperCase();
-            switch (AI) {
-                case "-N":
-                    player = new ComputerPlayer(new NaiveStrategy(username));
-                    break;
-                case "-S":
-                    player = new ComputerPlayer(new SmartStrategy(username));
-                    break;
+        boolean decision = TUI.getBoolean(Clientmess("Do you want AI to replace you ? Type YES or NO"));
+        if(decision) {
+            String choice = TUI.getString(Clientmess("Choose Native (-N) / Smart (-S)"));
+            if (choice.equals("-N")) {
+                player = new ComputerPlayer(new NaiveStrategy(username));
+            } else {
+                player = new ComputerPlayer(new SmartStrategy(username));
             }
         }else{
             player = new HumanPlayer(username);
@@ -392,56 +385,12 @@ public class Client implements Runnable{
     }
 
     /**
-     * Handle request from player by print the menu first and send content of request to player
-     * If player want to join a game. Ask player whenever they want an AI to play instead of them and set player role as your choice
-     * default for request which is not listed
-     * @throws IOException if I/O occurs when handling with user's choice.
+     *Connect player to server by enter address and number of port
+     * @throws IOException if I/O occurs when reading data from command
      */
-
-    public synchronized void handleUserchoice() throws IOException {
-        this.printHelp();
-        String choice = reader.readLine().toUpperCase();
-        boolean commandValid = false;
-        while (!commandValid) {
-            switch (choice) {
-                case Command.QUEUE:
-                    setupPlayer();
-                    sendCommand(Command.QUEUE);
-                    setState(ClientState.NEWGAME_AWAITING);
-                    commandValid = true;
-                    break;
-                case Command.LIST:
-                    sendCommand(LIST);
-                    commandValid = true;
-                    break;
-                case Command.HELP:
-                    this.printHelp();
-                    commandValid = true;
-                    break;
-                case Command.QUIT:
-                    handleQuit();
-                    commandValid = true;
-                    break;
-                default:
-                    TUI.println(Clientmess(ERROR + " Wrong request ! Please try again !"));
-                    this.printHelp();
-                    choice = reader.readLine().toUpperCase();
-                    break;
-            }
-        }
-    }
-
-    /**
-     * Print the help menu for user to choose.
-     */
-
-    private void printHelp() {
-        final String helpMenu = String.format("\nWHAT DO YOU WANT ?  ")+
-                        String.format(" \n [QUEUE] JOIN A NEW GAME"
-                                        +"\n [LIST] LIST OF ACTIVE PLAYERS"
-                                        +"\n [HELP] PRINT THE HELP MENU"
-                                        +"\n [QUIT] LOG OUT");
-        TUI.println(helpMenu);
+    public static void main(String[] args) throws IOException {
+        Client client = new Client();
+        client.TUI.start();
     }
 
 }

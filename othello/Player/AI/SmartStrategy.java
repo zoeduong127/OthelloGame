@@ -124,6 +124,7 @@ import java.util.List;
      * @return String name of strategy
      */
     //@ pure;
+    @Override
     public String getName() {
         return name;
     }

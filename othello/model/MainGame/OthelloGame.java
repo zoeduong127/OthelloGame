@@ -46,6 +46,7 @@ public class OthelloGame implements Game {
     ensures (\result == false) ==> (board.isFull() == false && getValidMoves().size() != 0);
     */
     //@ pure;
+    @Override
     public boolean isGameOver() {
         if(board.isFull()){
             return true;
@@ -74,6 +75,7 @@ public class OthelloGame implements Game {
         ensures (\result == player2) <==> (turn %2 != 0);
     */
     //@ pure;
+    @Override
     public Player getTurn() {
         if (turn % 2 == 0 ) {
             return player1;
@@ -92,6 +94,7 @@ public class OthelloGame implements Game {
         ensures(\result == null) <==> (isGameOver() == false);
     */
     //@ pure;
+    @Override
     public Player getWinner() {
         if (isGameOver()) {
             if (this.getScore(player1) > this.getScore(player2)){
@@ -142,6 +145,7 @@ public class OthelloGame implements Game {
       ensures  (\forall int i; 0 <= i  && i < (\result.size()); isValidMove(\result.get(i)) == true);
     */
     //@ pure;
+    @Override
 
     public List<Move> getValidMoves() {
         List<Move> validMoves = new ArrayList<>();
@@ -584,6 +588,7 @@ public class OthelloGame implements Game {
      * @return the symbol of the opposite mark.
      */
     //@ pure;
+    @Override
     public String getOppositeMark(){
         if(getMark().equals(Mark.XX.getSymbol())){
             return Mark.OO.getSymbol();

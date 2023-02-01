@@ -24,6 +24,7 @@ public class NaiveStrategy implements Strategy {
      */
     //@ ensures \result instanceof String;
     //@ pure;
+    @Override
     public String getName() {
         return name;
     }

@@ -11,7 +11,6 @@ import model.MainGame.Game;
 import model.MainGame.OthelloGame;
 import model.Move.Mark;
 import model.Move.Move;
-import model.Move.OthelloMove;
 
 import javax.swing.*;
 import java.util.Scanner;

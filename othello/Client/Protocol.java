@@ -28,7 +28,7 @@ public final class Protocol {
      * @return the right format of message
      */
 
-    public static String  Servermess( String input){
+    public static String Servermess( String input){
         return SERVER_MESS + input;
     }
     /**
@@ -43,7 +43,7 @@ public final class Protocol {
     /**
      * The list of client's state during the process connect and player with server.
      */
-    enum ClientState {
+    public enum ClientState {
         CONNECT_AWAITING,
         HELLO_AWAITING,
         LOGIN_AWAITING,

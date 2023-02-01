@@ -34,14 +34,14 @@ public abstract class AbstractPlayer implements Player {
      * @return the player's choice
      */
     //@ requires !game.isGameOver();
-//    @ ensures game.isValidMove(\result);
+    //@ ensures game.isValidMove(\result);
     public abstract Move determineMove(Game game);
 
     /**
      * Returns a representation of a player, i.e., their name
      * @return the String representation of this object
      */
-    @Override
+
     public String toString() {
         return "Player " + name;
     }
