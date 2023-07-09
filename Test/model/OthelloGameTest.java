@@ -17,6 +17,7 @@ class OthelloGameTest {
     private Player player2;
     private Board board;
 
+
     @BeforeEach
     void setUp() {
         board = new Board();

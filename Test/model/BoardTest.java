@@ -16,6 +16,7 @@ class BoardTest {
     }
 
 
+
     @Test
     void isField() {
         assertFalse(board.isField(-1,-2));

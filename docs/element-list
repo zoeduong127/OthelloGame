@@ -1,0 +1,6 @@
+Client
+model.MainGame
+model.Move
+Player.AI
+Player.Human
+UI
