@@ -1,7 +1,7 @@
 # Othello game
 
 Othello is a classic game that is popular in all over the world. It is a two-players game played on a board 8x*, where each player tries to capture as many of the opponent's pieces on the board at the end of the game wins.
-
+![img.png](img.png)
 # Requirements
 >This project requires Java ( IntellJ/ VScode) to set up.
 >
